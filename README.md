@@ -35,3 +35,19 @@ accessories. A ticket arrives; Frontline triages it and drafts a reply, publish 
     }
 }
 ```
+
+## How to Run:
+
+## Install Dependencies
+```sh
+uv sync --extra dev
+```
+
+### Via Debugger
+Press F5 or select "Debug: Frontline (Windows)" / "Debug: Frontline (Linux/Mac)" from Debug Configuration and Click ▶️ button
+
+### Via Terminal
+```sh
+uv run main.py classify "ticket_text" --method rule
+uv run main.py classify "ticket_text" --method llm
+```

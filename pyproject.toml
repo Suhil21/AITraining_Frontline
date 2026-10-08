@@ -5,7 +5,9 @@ description = "A ticket arrives; Frontline triages it and drafts a reply"
 readme = "README.md"
 requires-python = ">=3.13.5"
 dependencies = [
-    "openai>=3.24.0"
+    "httpx>=0.28.1",
+    "langchain-typesafe>=0.0.1a3",
+    "openai>=3.24.0",
 ]
 
 [dependency-groups]

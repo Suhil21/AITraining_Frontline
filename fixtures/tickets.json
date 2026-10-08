@@ -1,0 +1,94 @@
+[
+  {
+    "id": 1,
+    
+    "text": "Pi 5 keeps rebooting whenever I plug in my external SSD. Works fine without it.",
+    "product_model": "Raspberry Pi 5",
+    "human_label": "power",
+
+    "rule_based_prediction": "storage",
+    "rule_based_correct": false,
+    "why": "The word 'SSD' triggers the storage rule. A person reads 'reboots when I add a load' and knows it is the power supply."
+  },
+  {
+    "id": 2,
+    "text": "Ordered a Pi 5 last Tuesday and it still hasn't shipped. Can you check?",
+    "product_model": "Raspberry Pi 5",
+    "human_label": "other",
+    "rule_based_prediction": "other",
+    "rule_based_correct": true,
+    "why": "No product keyword at all. Both the rule and a person route it away from technical support."
+  },
+  {
+    "id": 3,
+    "text": "Green light comes on but nothing on the monitor. Tried two HDMI cables.",
+    "product_model": "Raspberry Pi 4 Model B",
+    "human_label": "boot",
+    "rule_based_prediction": "other",
+    "rule_based_correct": false,
+    "why": "No keyword matches. The rule has no entry for a symptom described without naming a component."
+  },
+  {
+    "id": 4,
+    "text": "Camera module 3 not detected. libcamera-hello says no cameras available.",
+    "product_model": "Camera Module 3",
+    "human_label": "camera",
+    "rule_based_prediction": "camera",
+    "rule_based_correct": true,
+    "why": "'camera' appears literally. This is the case keyword rules are good at, and it is why they get written."
+  },
+  {
+    "id": 5,
+    "text": "wifi drops every few minutes on my Pi 4 but ethernet is rock solid",
+    "product_model": "Raspberry Pi 4 Model B",
+    "human_label": "networking",
+    "rule_based_prediction": "networking",
+    "rule_based_correct": true,
+    "why": "'wifi' matches. Lowercase and unpunctuated, which the rule survives and a stricter one would not."
+  },
+  {
+    "id": 6,
+    "text": "My board died after 3 months. It's still under warranty right? I want a replacement.",
+    "product_model": "Raspberry Pi 5",
+    "human_label": "warranty",
+    "rule_based_prediction": "warranty",
+    "rule_based_correct": true,
+    "why": "'warranty' appears literally."
+  },
+  {
+    "id": 7,
+    "text": "SD card corrupted twice this month. Using a SanDisk 64GB. Is this a known issue?",
+    "product_model": "Raspberry Pi 4 Model B",
+    "human_label": "storage",
+    "rule_based_prediction": "storage",
+    "rule_based_correct": true,
+    "why": "'SD card' matches."
+  },
+  {
+    "id": 8,
+    "text": "Not a support request — just wanted to say the docs for the camera are excellent.",
+    "product_model": "Camera Module 3",
+    "human_label": "other",
+    "rule_based_prediction": "camera",
+    "rule_based_correct": false,
+    "why": "The single most instructive row. 'camera' matches, so the rule files praise as a camera fault. A keyword rule cannot tell you the sentence is not a complaint."
+  },
+  {
+    "id": 9,
+    "text": "Won't boot from USB after the firmware update. Was working before. Pi 4, 8GB.",
+    "product_model": "Raspberry Pi 4 Model B",
+    "human_label": "boot",
+    "rule_based_prediction": "boot",
+    "rule_based_correct": true,
+    "why": "'boot' appears literally, and here it happens to be right."
+  },
+  {
+    "id": 10,
+    "text": "Under heavy compile the board throttles and then the USB devices disconnect. Official 27W supply.",
+    "product_model": "Raspberry Pi 5",
+    "human_label": "power",
+    "rule_based_prediction": "power",
+    "rule_based_correct": true,
+    "why": "Right answer, wrong reasoning, and the accuracy number cannot tell you. The rule matched 'supply' inside 'Official 27W supply' — the clause where the customer is ruling the power supply OUT. It files this correctly by accident. Week 6 is where a judge can finally see the difference between right and right-for-a-reason."
+  }
+]
