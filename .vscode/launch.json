@@ -23,11 +23,11 @@
 
         // Comparison Bakeoff (Change the path like above to match Windows)
         {
-            "name": "Debug: Comparison Bakeoff (Linux/Mac)",
+            "name": "Debug: Comparison Calcuate (Linux/Mac)",
             "type": "debugpy",
             "request": "launch",
             "module": "main",
-            "args": ["bakeoff"],
+            "args": ["calculate_tokens"],
             "python": "${cwd}/.venv/bin/python"
         }
     ]

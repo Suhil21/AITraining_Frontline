@@ -1,6 +1,7 @@
 import argparse
 from collections.abc import Sequence
 
+from app.analysis.context_report import report
 from app.classifiers import classify_by_llm, classify_by_rules
 from app.classifiers.decision_based import classify_with_decision_model
 from app.scripts.bakeoff import format_scoreboard, run_bakeoff
@@ -20,6 +21,8 @@ def build_parser() -> argparse.ArgumentParser:
     bakeoff.add_argument(
         "--with-llm", action="store_true", help="also call the language model (live)"
     )
+
+    commands.add_parser("calculate_tokens", help="calculate token and print report")
 
     return parser
 
@@ -44,5 +47,7 @@ def run(argv: Sequence[str] | None = None) -> int:
         run_classify(args.ticket_text, args.method)
     elif args.command == "bakeoff":
         print(format_scoreboard(run_bakeoff()))
+    elif args.command == "calculate_tokens":
+        print(report())
 
-    return -1
+    return 0

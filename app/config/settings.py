@@ -35,3 +35,20 @@ def load_decision_settings() -> DecisionSettings:
         context_window=int(context_window) if context_window else 0,
         api_key=api_key,
     )
+
+
+@dataclass
+class TokenCountSettings:
+    model: str
+    api_key: str
+
+
+def load_token_count_settings() -> TokenCountSettings:
+    model = _require_env_var("TOKEN_COUNT_MODEL")
+    if "/" not in model:
+        raise ConfigError(
+            "TOKEN_COUNT_MODEL must be a LiteLLM model id of the form <provider>/<model>."
+        )
+    return TokenCountSettings(
+        model=model, api_key=os.environ.get("TOKEN_COUNT_API_KEY", "").strip()
+    )

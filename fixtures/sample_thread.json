@@ -1,0 +1,22 @@
+[
+  {
+    "user": "Pi 5 keeps rebooting whenever I plug in my external SSD. Works fine without it.",
+    "assistant": "That's usually the power supply struggling with the extra current draw from the SSD. Are you using the official 27W USB-C supply, or a third-party one?"
+  },
+  {
+    "user": "I'm using the official 27W supply that came with it. Still reboots the second I plug the SSD in.",
+    "assistant": "Thanks — that rules out the most common cause. Which SSD model and enclosure are you using, and does it draw power from the Pi or have its own source?"
+  },
+  {
+    "user": "It's a Samsung T7 portable SSD, USB-C, no separate power — it draws from the Pi.",
+    "assistant": "A T7 can spike current on spin-up, which a 27W supply should cover, but a marginal cable can cause voltage sag. Can you try a different USB-C cable rated for 5A?"
+  },
+  {
+    "user": "Just tried a different cable — same thing, reboots within a few seconds of plugging in the SSD.",
+    "assistant": "Understood. That points to a hardware interaction rather than a cable fault. I'm escalating this to a hardware specialist and will follow up with next steps."
+  },
+  {
+    "user": "Any update? It's been two days and I need this working for a deployment.",
+    "assistant": "Apologies for the delay — the hardware team confirmed a known interaction between Pi 5 and some USB-C SSD enclosures with insufficient inrush protection. We're sending a replacement power delivery board free of charge; tracking follows within 24 hours."
+  }
+]

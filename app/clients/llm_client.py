@@ -74,6 +74,26 @@ def request_timeout_seconds() -> float:
     return float(os.environ.get("LLM_TIMEOUT_SECONDS", DEFAULT_TIMEOUT_SECONDS))
 
 
+def client_for(slot: ModelSlot) -> OpenAI:
+    """The SDK client for one slot: the per-call timeout, no silent retries, no redirects."""
+    return OpenAI(
+        base_url=slot.base_url,
+        api_key=slot.api_key,
+        timeout=request_timeout_seconds(),
+        max_retries=0,
+    )
+
+
+def call_slot(slot: ModelSlot, messages: list[dict], **create_kwargs) -> object:
+    """Ask ONE slot, with no fallback: for a caller that must know which endpoint answered.
+
+    Raises whatever the SDK raises. `call_with_fallback` is the one to use when any slot will do.
+    """
+    return client_for(slot).chat.completions.create(
+        model=slot.model_name, messages=messages, **create_kwargs
+    )
+
+
 def call_with_fallback(
     messages: list[dict], **create_kwargs
 ) -> tuple[ModelSlot, object, list[dict]]:
