@@ -4,3 +4,5 @@
 
 # Python
 __pycache__/
+# Recorded model output, captured locally
+fixtures/overflow_behaviour.json
