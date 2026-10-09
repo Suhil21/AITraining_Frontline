@@ -1,4 +1,6 @@
 import argparse
+import json
+import sys
 from collections.abc import Sequence
 
 from app.analysis.claim_flagging import build_claim_prompt, flag_unverified_claims
@@ -8,7 +10,10 @@ from app.analysis.sample_thread import ticket_text
 from app.analysis.sampling import build_drafting_prompt, sample_drafts
 from app.classifiers import classify_by_llm, classify_by_rules
 from app.classifiers.decision_based import classify_with_decision_model
-from app.clients.llm_client import call_with_fallback
+from app.clients.decision_client import DecisionUnavailableError
+from app.clients.llm_client import AllSlotsFailedError, call_with_fallback
+from app.config.settings import ConfigError
+from app.pipeline.triage_pipeline import result_to_dict, triage_ticket
 from app.scripts.bakeoff import format_scoreboard, run_bakeoff
 
 CLASSIFY_METHODS = ("rule", "llm", "decision")
@@ -41,6 +46,9 @@ def build_parser() -> argparse.ArgumentParser:
 
     flag = commands.add_parser("flag", help="draft a reply and flag its checkable claims (live)")
     flag.add_argument("--ticket-id", type=int, default=6)
+
+    triage = commands.add_parser("triage", help="route a ticket and draft a reply (v0.1)")
+    triage.add_argument("ticket_text")
 
     return parser
 
@@ -86,6 +94,32 @@ def run_flag(ticket_id: int) -> None:
         print(f"- {sentence}")
 
 
+def run_triage(ticket_text: str) -> int:
+    """stdout is one JSON object; stderr is for people. A known failure is one readable line
+    and a non-zero exit, never a traceback."""
+    if not ticket_text.strip():
+        print("triage: ticket text is empty", file=sys.stderr)
+        return 2
+    try:
+        result, diagnostics = triage_ticket(ticket_text)
+    except AllSlotsFailedError as exc:
+        print(f"triage: the language model failed on every configured slot: {exc}", file=sys.stderr)
+        return 1
+    except DecisionUnavailableError as exc:
+        print(f"triage: the decision model did not answer: {exc}", file=sys.stderr)
+        return 1
+    except ConfigError as exc:
+        print(f"triage: {exc}", file=sys.stderr)
+        return 1
+
+    for attempt in diagnostics.failed_attempts:
+        print(f"triage: slot {attempt['slot']} failed first: {attempt['error']}", file=sys.stderr)
+    slot = diagnostics.answering_slot
+    print(f"triage: reply drafted by slot {slot.label} ({slot.model_name})", file=sys.stderr)
+    print(json.dumps(result_to_dict(result), indent=2))
+    return 0
+
+
 def run(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     if args.command == "classify":
@@ -100,5 +134,7 @@ def run(argv: Sequence[str] | None = None) -> int:
         run_decision_repeat(args.ticket_id, args.count)
     elif args.command == "flag":
         run_flag(args.ticket_id)
+    elif args.command == "triage":
+        return run_triage(args.ticket_text)
 
     return 0

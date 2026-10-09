@@ -1,8 +1,13 @@
 import warnings
 
 from langchain_typesafe import ClassifierResponse, Question, State, TypeSafeClassifier
+from langchain_typesafe.client import TypeSafeError
 
 from app.config.settings import DecisionSettings, load_decision_settings
+
+
+class DecisionUnavailableError(RuntimeError):
+    """The decision endpoint gave no answer (bad key, network, timeout, bad request)."""
 
 
 class DecisionClient:
@@ -20,4 +25,7 @@ class DecisionClient:
 
     def decide(self, state: State, questions: dict[str, Question]) -> ClassifierResponse:
         """Make a decision based on the provided state and question."""
-        return self._classifier_client.invoke({"state": state, "questions": questions})
+        try:
+            return self._classifier_client.invoke({"state": state, "questions": questions})
+        except TypeSafeError as exc:
+            raise DecisionUnavailableError(f"{type(exc).__name__}: {exc}") from exc
