@@ -2,6 +2,7 @@ import argparse
 from collections.abc import Sequence
 
 from app.analysis.context_report import report
+from app.analysis.decision_repeat import repeat_decision, summarise_spread
 from app.analysis.sample_thread import ticket_text
 from app.analysis.sampling import build_drafting_prompt, sample_drafts
 from app.classifiers import classify_by_llm, classify_by_rules
@@ -29,6 +30,12 @@ def build_parser() -> argparse.ArgumentParser:
     sample = commands.add_parser("sample", help="same prompt several times, three settings (live)")
     sample.add_argument("--ticket-id", type=int, default=3)
     sample.add_argument("--runs", type=int, default=5, help="calls per setting")
+
+    repeat = commands.add_parser(
+        "decision_repeat", help="same ticket to the decision model N times (live)"
+    )
+    repeat.add_argument("--ticket-id", type=int, default=3)
+    repeat.add_argument("--count", type=int, default=20)
 
     return parser
 
@@ -58,6 +65,12 @@ def run_sample(ticket_id: int, runs: int) -> None:
         print(f"  last:  {drafts[-1][:100]!r}")
 
 
+def run_decision_repeat(ticket_id: int, count: int) -> None:
+    answers = repeat_decision(ticket_text(ticket_id), count)
+    for key, value in summarise_spread(answers).items():
+        print(f"{key}: {value}")
+
+
 def run(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     if args.command == "classify":
@@ -68,5 +81,7 @@ def run(argv: Sequence[str] | None = None) -> int:
         print(report())
     elif args.command == "sample":
         run_sample(args.ticket_id, args.runs)
+    elif args.command == "decision_repeat":
+        run_decision_repeat(args.ticket_id, args.count)
 
     return 0
