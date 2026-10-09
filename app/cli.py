@@ -1,12 +1,14 @@
 import argparse
 from collections.abc import Sequence
 
+from app.analysis.claim_flagging import build_claim_prompt, flag_unverified_claims
 from app.analysis.context_report import report
 from app.analysis.decision_repeat import repeat_decision, summarise_spread
 from app.analysis.sample_thread import ticket_text
 from app.analysis.sampling import build_drafting_prompt, sample_drafts
 from app.classifiers import classify_by_llm, classify_by_rules
 from app.classifiers.decision_based import classify_with_decision_model
+from app.clients.llm_client import call_with_fallback
 from app.scripts.bakeoff import format_scoreboard, run_bakeoff
 
 CLASSIFY_METHODS = ("rule", "llm", "decision")
@@ -36,6 +38,9 @@ def build_parser() -> argparse.ArgumentParser:
     )
     repeat.add_argument("--ticket-id", type=int, default=3)
     repeat.add_argument("--count", type=int, default=20)
+
+    flag = commands.add_parser("flag", help="draft a reply and flag its checkable claims (live)")
+    flag.add_argument("--ticket-id", type=int, default=6)
 
     return parser
 
@@ -71,6 +76,16 @@ def run_decision_repeat(ticket_id: int, count: int) -> None:
         print(f"{key}: {value}")
 
 
+def run_flag(ticket_id: int) -> None:
+    prompt = build_claim_prompt(ticket_text(ticket_id))
+    _, response, _ = call_with_fallback([{"role": "user", "content": prompt}])
+    draft = response.choices[0].message.content or ""
+    print(draft)
+    print("\n--- flagged (found, not verified) ---")
+    for sentence in flag_unverified_claims(draft):
+        print(f"- {sentence}")
+
+
 def run(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     if args.command == "classify":
@@ -83,5 +98,7 @@ def run(argv: Sequence[str] | None = None) -> int:
         run_sample(args.ticket_id, args.runs)
     elif args.command == "decision_repeat":
         run_decision_repeat(args.ticket_id, args.count)
+    elif args.command == "flag":
+        run_flag(args.ticket_id)
 
     return 0
