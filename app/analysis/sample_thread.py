@@ -1,5 +1,7 @@
 import json
 
+from app.scripts.bakeoff import load_tickets
+
 EXCHANGES_PATH = "fixtures/sample_thread.json"
 
 SYSTEM_TURN = {
@@ -22,3 +24,7 @@ def thread_after(exchange_count: int) -> list[dict]:
         turns.append({"role": "user", "content": exchange["user"]})
         turns.append({"role": "assistant", "content": exchange["assistant"]})
     return turns
+
+
+def ticket_text(ticket_id: int) -> str:
+    return next(ticket["text"] for ticket in load_tickets() if ticket["id"] == ticket_id)
