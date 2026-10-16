@@ -43,4 +43,4 @@ def window_lines() -> list[str]:
 
 
 def report(recorded_usage: bool = False) -> str:
-    return "\n".join([*growth_lines(recorded_usage), *window_lines()])
+    return "\n".join([*growth_lines(), *window_lines()])
